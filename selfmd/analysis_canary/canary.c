@@ -12,6 +12,5 @@ void win() {
 int main() {
     char    buf[0x90];
     printf("Do it to me.\n");
-
-    gets(buf);
+    scanf("%s", buf);
 }
