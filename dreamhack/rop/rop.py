@@ -1,6 +1,7 @@
 from pwn import *
 
-p = process('./rop')
+#p = process('./rop')
+p = remote('host3.dreamhack.games', '21835')
 e = ELF('./rop')
 libc = ELF('./libc.so.6')
 
