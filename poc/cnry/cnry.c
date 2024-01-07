@@ -16,7 +16,7 @@ int main() {
     printf("Leak: ");
     read(0, buf, 0x100);
     printf("%s", buf);
-    
+
     printf("Exploit: ");
     read(0, buf, 0x100);
 }
