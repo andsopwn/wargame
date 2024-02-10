@@ -1,7 +1,7 @@
 FROM ubuntu:16.04@sha256:91bd29a464fdabfcf44e29e1f2a5f213c6dfa750b6290e40dd6998ac79da3c41
 
 ENV user hook
-ENV chall_port 10001
+ENV chall_port 7182
 
 RUN apt-get update
 RUN apt-get -y install socat

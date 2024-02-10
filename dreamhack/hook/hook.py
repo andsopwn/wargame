@@ -1,7 +1,8 @@
 from pwn import *
 
 #p = process('./hook')
-p = remote('host3.dreamhack.games', '16776')
+#p = remote('host3.dreamhack.games', '16776')
+p = remote('127.0.0.1', '7182')
 libc = ELF('./libc-2.23.so')
 
 p.recvuntil(b"stdout: ")
