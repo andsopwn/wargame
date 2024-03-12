@@ -167,3 +167,5 @@ peda-session-dash.txt
 *.pcap
 
 .gdb_history
+
+poc/*
