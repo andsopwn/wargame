@@ -169,3 +169,5 @@ peda-session-dash.txt
 .gdb_history
 
 poc/*
+
+.DS_Store

