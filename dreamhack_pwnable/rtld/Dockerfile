@@ -1,6 +1,6 @@
-FROM ubuntu:18.04@sha256:d1d454df0f579c6be4d8161d227462d69e163a8ff9d20a847533989cf0c94d90
+FROM ubuntu:16.04@sha256:1f1a2d56de1d604801a9671f301190704c25d604a416f59e03c04f5c6ffee0d6
 
-ENV user tcache_dup
+ENV user rtld
 ENV chall_port 10001
 
 RUN apt-get update
@@ -21,5 +21,4 @@ RUN chmod 440 /home/$user/flag
 WORKDIR /home/$user
 USER $user
 EXPOSE $chall_port
-CMD while :; do socat -T 30 TCP-LISTEN:$chall_port,reuseaddr,fork EXEC:/home/$user/$user ; done
-
+CMD socat -T 30 TCP-LISTEN:$chall_port,reuseaddr,fork EXEC:/home/$user/$user

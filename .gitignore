@@ -168,6 +168,16 @@ peda-session-dash.txt
 
 .gdb_history
 
+dreamhack_cloud/*
+dreamhack_misc/*
+pwnable_kr/*
 poc/*
+*.6
 
 .DS_Store
+
+# exploit code blind
+dreamhack_pwnable/rot-253/*
+dreamhack_pwnable/newstrcmp/*
+dreamhack_pwnable/sea_of_stack/*
+dreamhack_pwnable/iofile/*

