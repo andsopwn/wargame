@@ -170,7 +170,9 @@ peda-session-dash.txt
 
 dreamhack_cloud/*
 dreamhack_misc/*
-pwnable_kr/*
+pwnable.kr/*
+pwnable.tw/*
+pwnable.xyz/*
 poc/*
 *.6
 
